@@ -1,5 +1,47 @@
-This is great. The final piece of the concentration puzzle is your investment portfolio. The key is to understand whether your investments balance your career risk or amplify it.
+# W2 Strategy MCP - Investment Risk Assessment Prompt
 
-For instance, the tech worker we talked about might amplify their risk by investing heavily in individual tech stocks or growth-focused funds. A different approach would be to balance that career risk by diversifying into other sectors, like healthcare, consumer staples, or international markets.
+Now that we've established where your job sits on the economic sensitivity scale, let's look at how you approach investing.
 
-Without needing specific numbers, how would you describe your investment strategy? Does it lean into the same economic trends as your career, or does it intentionally diversify away from them?
+When you think about your taxable investment accounts - the money you invest outside of retirement accounts like 401ks - how would you describe your approach? Are you someone who leans more toward stocks, bonds, or do you keep things pretty balanced between the two?
+
+I'm asking because different investment approaches have different relationships with economic cycles. Stocks tend to be more sensitive to economic ups and downs, while bonds are generally more stable. Understanding your investment style helps us see the complete picture of your economic exposure.
+
+---
+
+## Framework for MCP Classification:
+
+**HIGH INVESTMENT RISK (Rating: 3) - Cyclical/Growth-Oriented:**
+- User says: "mostly stocks", "all equity", "growth focused", "aggressive", "high risk", "index funds", "tech stocks"
+- Stocks are cyclical - rise and fall with economic cycles
+- Amplifies economic sensitivity
+
+**MODERATE INVESTMENT RISK (Rating: 2) - Balanced Approach:**  
+- User says: "balanced", "mix of stocks and bonds", "60/40", "moderate", "some of both", "diversified"
+- Balanced approach with some stability from bonds
+- Neutral economic sensitivity
+
+**LOW INVESTMENT RISK (Rating: 1) - Conservative/Stable:**
+- User says: "mostly bonds", "conservative", "cash heavy", "CDs", "stable investments", "treasuries", "money market"
+- Conservative approach focused on stability over growth
+- Counter-cyclical or stable during economic stress
+
+## Follow-up Logic:
+
+**After capturing their response:**
+1. Acknowledge their approach: "Got it, so you lean [conservative/balanced/aggressive] with your taxable investments."
+
+2. Calculate overall economic exposure:
+   - Economic Exposure Score = (Job Rating × 0.6) + (Investment Rating × 0.4)
+   - Round to nearest whole number (1-3)
+   - Store both individual ratings and combined score
+
+3. Provide insight based on combined score:
+   - Score 1-1.7: "You have relatively low economic exposure overall"
+   - Score 1.8-2.3: "You have moderate economic exposure" 
+   - Score 2.4-3: "You have high economic exposure to economic cycles"
+
+4. Store taxable_investment_risk_level (1-3) and move to homeowner analysis
+
+## Sample Transition to Next Step:
+
+"This gives me a clear picture of both your job and investment sensitivity to economic cycles. Let me put these together and show you what this means for your overall economic exposure..."
