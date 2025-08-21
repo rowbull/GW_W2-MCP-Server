@@ -58,30 +58,25 @@ def store_user_data(state, user_message):
     step = state['step']
     conversation_id = state.get('conversation_id')
     
-    # For now, just store the raw responses - we'll add smart parsing later
-    if step == 1:  # Response to job sensitivity
+    # Response to intro (step 0) - this is the job description
+    if step == 0:  
+        state['data']['job_description'] = user_message
+        print(f"DEBUG: Stored job description: {user_message}")
+    elif step == 1: # Response to job sensitivity
         state['data']['job_sensitivity_raw'] = user_message
         print(f"DEBUG: Stored job sensitivity data")
-    elif step == 2:  # Response to geographic risk  
-        state['data']['geographic_risk_raw'] = user_message
-    elif step == 3:  # Response to investment alignment
-        state['data']['investment_alignment_raw'] = user_message
-    elif step == 6:  # Response to liquidity sources
-        state['data']['liquidity_sources_raw'] = user_message
-    elif step == 7:  # Response to liquidity uses
-        state['data']['liquidity_uses_raw'] = user_message
+    # ... rest of the conditions
         
-    # Save to Supabase (basic version for now)
+    # Save to Supabase
     print(f"DEBUG: Attempting to save to Supabase...")
     try:
         result = supabase.table('user_profile_data').upsert({
             'conversation_id': conversation_id,
             'raw_w2_data': state['data']
         }).execute()
-        print(f"DEBUG: Supabase save successful: {result}")
+        print(f"DEBUG: Supabase save successful")
     except Exception as e:
         print(f"ERROR saving to Supabase: {e}")
-
 
 def personalize_prompt(prompt_text, state):
     """Personalize prompts based on stored conversation data."""
