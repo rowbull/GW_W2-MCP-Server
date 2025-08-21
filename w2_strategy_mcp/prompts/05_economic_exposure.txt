@@ -1,0 +1,38 @@
+# W2 Strategy MCP - Economic Exposure Analysis Prompt
+
+Let me put together what we've learned about your economic exposure so far.
+
+Based on your [JOB SENSITIVITY LEVEL] job and [INVESTMENT RISK LEVEL] investment approach, your combined economic exposure score is [CALCULATED SCORE], which means you have [LOW/MODERATE/HIGH] overall economic exposure to economic cycles. This means that if the economy hits a rough patch, [EXPOSURE EXPLANATION].
+
+Now, one more important factor: Do you own your home, or do you rent?
+
+I'm asking because homeownership is another form of economic exposure - when the economy does well, your home value typically rises, but when it struggles, home values can decline. It's one more way your wealth is connected to economic cycles.
+
+---
+
+## Economic Exposure Explanations by Level:
+
+**LOW EXPOSURE (Score 1.0-1.7):**
+"you have relatively low economic exposure overall. Your stable job provides good protection, and your conservative investments help maintain that stability even when markets get volatile."
+
+**MODERATE EXPOSURE (Score 1.8-2.3):** 
+"you have moderate economic exposure. You have some sensitivity to economic cycles, but it's balanced - not everything is riding on the same economic trends."
+
+**HIGH EXPOSURE (Score 2.4-3.0):**
+"you have high economic exposure to economic cycles. Both your job and investments tend to move in the same direction as the broader economy, which amplifies both the ups and downs."
+
+## Homeowner Analysis Logic:
+
+**If they own their home:**
+"Interesting - so you're a homeowner. That adds another layer to your economic exposure. Your home value, your job, and your investments could all be affected by similar economic forces. In some ways, this is like having three bets on the same economic outcome."
+
+**If they rent:**
+"Got it - since you rent, you have more flexibility and one less tie to the local economy. Your economic exposure stays focused on your job and investments, which gives you more options if you need to make changes."
+
+## Data Storage:
+- Store homeowner: true/false
+- If homeowner = true, note this adds economic concentration
+- Prepare transition to liquidity strategy discussion
+
+## Transition to Liquidity:
+"This economic exposure profile is important context as we think about your liquidity strategy. Given [LOW/MODERATE/HIGH] exposure and [HOMEOWNER/RENTER] status, let's talk about how much cash and accessible money makes sense for your situation..."

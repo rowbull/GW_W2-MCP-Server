@@ -1,1 +1,0 @@
-This is the transition point for economic concentration. The logic is handled in logic.py.

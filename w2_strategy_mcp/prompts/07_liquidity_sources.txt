@@ -1,7 +1,38 @@
-Let's build a quick inventory of your liquidity sources. Think across these categories:
+# W2 Strategy MCP - Liquidity Sources Prompt
 
-1.  **Immediate Cash**: How much do you have in checking, savings, or money market accounts? This is cash you can access today with no tax implications.
-2.  **Available Credit**: What's the total available limit on your credit cards or any lines of credit (like a HELOC)? This is instant access to capital, but it comes with an interest cost.
-3.  **Marketable Securities**: Do you have investments in a brokerage account (stocks, bonds, ETFs, mutual funds) that could be sold and converted to cash within a few days? This source can be powerful, but may have tax consequences or require selling at a bad time.
+Let's start by understanding what liquidity sources you currently have available. I'm going to ask about a few different categories, and don't worry about being exact - rough estimates are fine.
 
-You don't need to share exact numbers, but just a rough sense of each category. For example, "I have about 3 months of expenses in cash, minimal credit card debt, and a decent-sized brokerage account."
+**Cash and Cash Equivalents:**
+How much do you have in checking accounts, savings accounts, and money market accounts combined? This is money you can access immediately with no penalties or tax implications.
+
+**Brokerage Cash:**
+Do you keep any cash in your brokerage accounts - cash that's not invested but sitting there available? This is money you can access without having to sell any investments.
+
+**Available Credit:**
+What's your available credit across credit cards and lines of credit? I know it sounds counterintuitive to think of debt as liquidity, but available credit can be an important bridge in certain situations.
+
+[IF HOMEOWNER] **Home Equity Line of Credit (HELOC):**
+Do you have a HELOC set up? If yes, how much is available to borrow on it right now?
+
+The idea here isn't to judge any particular number - it's to understand your complete liquidity picture so we can see how it matches up with potential needs.
+
+---
+
+## Data Collection Framework:
+
+**Primary Liquidity (Immediate Access):**
+- deposits_amount: Checking + savings + money market
+- brokerage_cash_amount: Cash sitting in investment accounts
+
+**Secondary Liquidity (Quick Access):**
+- available_credit_amount: Credit cards + personal lines of credit
+- heloc_amount: Home equity line (if homeowner)
+
+**Notes for MCP Logic:**
+- Accept rough estimates ("around $25,000", "maybe $5,000")
+- Don't push for exact numbers - this is strategic planning, not accounting
+- If they mention liquid securities (bonds, stable ETFs), capture separately
+- Focus on money they can access within days, not weeks
+
+## Transition Setup:
+After collecting this data: "Good, so you have [TOTAL APPROXIMATE] in various forms of liquidity. Now let's think about what you might actually need that money for..."
