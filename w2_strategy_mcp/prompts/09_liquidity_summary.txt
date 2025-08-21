@@ -1,1 +1,48 @@
-This is the transition point for liquidity summary. The logic is handled in logic.py.
+# W2 Strategy MCP - Liquidity Summary Prompt
+
+Let me put together your complete liquidity picture.
+
+**Your Available Liquidity:** [TOTAL SOURCES]
+- Cash accounts: [DEPOSITS AMOUNT]
+- Brokerage cash: [BROKERAGE CASH]
+- Available credit: [CREDIT AMOUNT]
+[IF HOMEOWNER WITH HELOC] - HELOC availability: [HELOC AMOUNT]
+
+**Your Liquidity Needs:** [TOTAL USES]
+- Emergency fund target: [MONTHLY EXPENSES] × [TARGET MONTHS] = [BASE AMOUNT]
+- Additional scenarios: [OTHER SCENARIOS TOTAL]
+
+**Bottom Line:** You have a [SURPLUS/DEFICIT] of [AMOUNT] in liquidity.
+
+[IF SURPLUS] This means you're in good shape liquidity-wise, and might even consider whether some of that cash could be working harder for you elsewhere.
+
+[IF DEFICIT] This suggests you might want to build up more accessible liquidity, either through saving more cash or expanding your credit facilities.
+
+**Three Key Liquidity Risks to Keep in Mind:**
+
+1. **Stacked Events:** Multiple things hitting at once - like losing your job during a market downturn when your home also needs major repairs. Your [HIGH/MODERATE/LOW] economic exposure makes this [more/less] likely.
+
+2. **Timing Issues:** Needing cash when your other sources aren't accessible - like credit markets tightening during economic stress, or not being able to access a HELOC when you need it most.
+
+3. **Opportunity Costs:** Having too much in cash when you could be earning better returns, vs. having too little when you need flexibility.
+
+The goal is finding the right balance for your specific economic exposure profile and comfort level.
+
+---
+
+## Calculation Logic:
+
+**Total Sources:**
+deposits_amount + brokerage_cash_amount + available_credit_amount + heloc_amount
+
+**Total Uses:**
+(monthly_spending_estimate × emergency_budget_months) + additional_scenarios
+
+**Surplus/Deficit:**
+liquidity_surplus_deficit = Total Sources - Total Uses
+
+**Risk Personalization:**
+- HIGH economic exposure: "more likely" + emphasize stacked events
+- LOW economic exposure: "less likely" + focus on efficiency
+- HOMEOWNER: Include property-related risks
+- RENTER: Focus on job/health/transportation scenarios
