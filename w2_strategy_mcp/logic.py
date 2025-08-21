@@ -38,7 +38,7 @@ def start_conversation():
     conversations[conversation_id] = {
         'step': 0,
         'history': [],
-        'data': {} # To store user's answers
+        'data': {}
     }
 
     prompt_key = get_current_prompt_key(0)
@@ -54,66 +54,65 @@ def start_conversation():
 
 def store_user_data(state, user_message):
     """Extract and store data from user message to Supabase."""
-    print(f"DEBUG: store_user_data called with step {state['step']}")
     step = state['step']
     conversation_id = state.get('conversation_id')
     
-    # Response to intro (step 0) - this is the job description
-    if step == 0:  
-        state['data']['job_description'] = user_message
-        print(f"DEBUG: Stored job description: {user_message}")
-    elif step == 1: # Response to job sensitivity
+    # Store the response for this step
+    if step == 1:  # Job sensitivity response
         state['data']['job_sensitivity_raw'] = user_message
-        print(f"DEBUG: Stored job sensitivity data")
-    # ... rest of the conditions
+        # TODO: Parse and determine job_economic_sensitivity (1-3 scale)
         
-    # Save to Supabase
-    print(f"DEBUG: Attempting to save to Supabase...")
-    try:
-        result = supabase.table('user_profile_data').upsert({
-            'conversation_id': conversation_id,
-            'raw_w2_data': state['data']
-        }).execute()
-        print(f"DEBUG: Supabase save successful")
-    except Exception as e:
-        print(f"ERROR saving to Supabase: {e}")
+    elif step == 2:  # Geographic risk response
+        state['data']['geographic_risk_raw'] = user_message
+        
+    elif step == 3:  # Investment alignment response
+        state['data']['investment_alignment_raw'] = user_message
+        
+    elif step == 6:  # Liquidity sources response
+        state['data']['liquidity_sources_raw'] = user_message
+        
+    elif step == 7:  # Liquidity uses response
+        state['data']['liquidity_uses_raw'] = user_message
+
+    # Save to Supabase when we have meaningful data
+    if conversation_id and len(state['data']) > 0:
+        try:
+            # For now, just store the conversation data
+            # TODO: Parse responses and populate specific columns
+            result = supabase.table('user_profile_data').upsert({
+                'id': conversation_id,  # Use conversation_id as primary key
+                'conversation_data': state['data']
+            }).execute()
+        except Exception as e:
+            print(f"Error saving to Supabase: {e}")
 
 def personalize_prompt(prompt_text, state):
     """Personalize prompts based on stored conversation data."""
     step = state['step']
 
-    # Personalize concentration summary
-    if step == 4: # 05_concentration_summary
-        # A more advanced implementation would analyze the raw text.
-        # For now, we just acknowledge that they've provided input.
+    if step == 4:  # Concentration summary
         job_summary = state['data'].get('job_sensitivity_raw', '...')
         geo_summary = state['data'].get('geographic_risk_raw', '...')
         invest_summary = state['data'].get('investment_alignment_raw', '...')
 
-        # This is a simplified personalization for demonstration.
-        # It references the existence of prior answers.
         prompt_text = (
             f"Thank you for sharing that. We've discussed:\n"
-            f"- Your job's economic sensitivity: '{job_summary[:50]}...'\n"
-            f"- Your geographic concentration: '{geo_summary[:50]}...'\n"
-            f"- Your investment alignment: '{invest_summary[:50]}...'\n\n"
-            "Seeing it all together is powerful. It's not about being 'right' or 'wrong,' but about being aware.\n\n"
-            "This understanding of risk concentration leads directly to our next topic: building a sophisticated liquidity strategy. A strong liquidity plan is your best defense against the risks we've just discussed. Shall we move on to that?"
+            f"- Your job's economic sensitivity\n"
+            f"- Your geographic concentration\n"
+            f"- Your investment alignment\n\n"
+            "This understanding of risk concentration leads directly to our next topic: "
+            "building a sophisticated liquidity strategy. Ready to move on to that?"
         )
 
-    # Personalize liquidity summary
-    if step == 8: # 09_liquidity_summary
-        sources_summary = state['data'].get('liquidity_sources_raw', '...')
+    elif step == 8:  # Liquidity summary
         prompt_text = (
-            f"It's a different way of thinking, for sure. So let's bring it all together.\n\n"
-            f"On one hand, you have your liquidity sources, which you described as: '{sources_summary[:100]}...'\n"
-            f"On the other, you have potential needs beyond just job loss, like health, property, or family emergencies.\n\n"
-            "How does your current liquidity stack up against this broader view of potential needs? Do you see any gaps, or maybe opportunities to be more efficient?\n\n"
-            "This is the core of strategic liquidity: matching the right type of capital to the right type of risk."
+            "Let's bring it all together. You've shared your liquidity sources and "
+            "we've talked about potential uses beyond just job loss.\n\n"
+            "How does your current liquidity stack up against this broader view of potential needs? "
+            "Do you see any gaps, or opportunities to be more efficient?"
         )
 
     return prompt_text
-
 
 @app.route('/respond', methods=['POST'])
 def respond():
@@ -126,13 +125,13 @@ def respond():
         return jsonify({'error': 'Invalid conversation ID'}), 400
 
     state = conversations[conversation_id]
-    state['conversation_id'] = conversation_id  # ADD THIS LINE HERE
+    state['conversation_id'] = conversation_id
     state['history'].append({'speaker': 'user', 'text': user_message})
 
     # Store data from previous step's response
     store_user_data(state, user_message)
 
-    # Increment step to get the *next* prompt
+    # Increment step to get the next prompt
     state['step'] += 1
     current_step_index = state['step']
 
@@ -149,9 +148,8 @@ def respond():
             'response': prompt_text
         })
     else:
-        # Use the final conclusion prompt
-        conclusion_key = get_current_prompt_key(len(PROMPTS) - 1)
-        conclusion_text = PROMPTS[conclusion_key]
+        # End of conversation
+        conclusion_text = "Thank you for this thoughtful conversation about your financial strategy."
         return jsonify({
             'conversation_id': conversation_id,
             'response': conclusion_text
