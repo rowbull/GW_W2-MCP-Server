@@ -126,6 +126,7 @@ def respond():
         return jsonify({'error': 'Invalid conversation ID'}), 400
 
     state = conversations[conversation_id]
+    state['conversation_id'] = conversation_id  # ADD THIS LINE HERE
     state['history'].append({'speaker': 'user', 'text': user_message})
 
     # Store data from previous step's response
