@@ -1,5 +1,35 @@
-Excellent. When most people hear "liquidity," they think of a simple emergency fund—usually 3-6 months of living expenses tucked away in a savings account.
+# W2 Strategy MCP - Liquidity Introduction Prompt
 
-That's a great start, but a truly comprehensive liquidity strategy is much broader. It's about understanding ALL your potential sources of cash and ALL the potential reasons you might need it, not just job loss.
+Now that we understand your economic exposure profile, let's talk about your liquidity strategy - basically, how much cash and easily accessible money makes sense for your situation.
 
-Let's start by mapping out your sources of liquidity. We'll look at everything from cash to credit to investments. Ready?
+Given your [LOW/MODERATE/HIGH] economic exposure [and homeowner status], your liquidity needs are unique to you. 
+
+Most people think about emergency funds in terms of "3-6 months of expenses," but that's pretty generic advice. We're going to look at this more strategically by considering:
+
+1. **Your sources of liquidity** - what money you can actually access quickly if needed
+2. **Your uses for that money** - not just job loss, but other scenarios where you might need cash fast
+3. **How your economic exposure affects both sides** - someone with high exposure might need more liquidity, or access to it faster
+
+The goal isn't to tell you exactly how much to keep in cash, but to help you think through a liquidity strategy that makes sense for your specific situation.
+
+Ready to dig into the details?
+
+---
+
+## Context Variables for Personalization:
+
+**Economic Exposure Levels:**
+- LOW: "your relatively stable economic profile means you can probably be more efficient with cash"
+- MODERATE: "your balanced economic profile gives you some flexibility in liquidity planning" 
+- HIGH: "your high economic exposure means liquidity planning becomes more important"
+
+**Homeowner Status:**
+- Owner: "and homeowner status" → adds complexity to liquidity needs
+- Renter: "" → simpler liquidity planning
+
+## Transition Logic:
+This prompt sets up the detailed liquidity analysis by:
+1. Connecting economic exposure to liquidity needs
+2. Explaining this isn't generic "emergency fund" advice
+3. Introducing the sources vs. uses framework
+4. Preparing for detailed liquidity inventory
