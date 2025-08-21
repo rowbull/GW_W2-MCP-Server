@@ -1,6 +1,7 @@
 import os
 from flask import Flask, request, jsonify
 import uuid
+from supabase import create_client, Client
 
 app = Flask(__name__)
 
@@ -8,136 +9,180 @@ app = Flask(__name__)
 conversations = {}
 PROMPTS = {}
 
+# Supabase configuration
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
 def load_prompts():
-    """Load all prompts from the prompts directory into memory."""
-    global PROMPTS
-    prompt_dir = os.path.join(os.path.dirname(__file__), 'prompts')
-    # Ensure consistent order by sorting filenames
-    for filename in sorted(os.listdir(prompt_dir)):
+    """Load all prompt files from the prompts directory."""
+    prompts_dir = os.path.join('w2_strategy_mcp', 'prompts')
+    
+    if not os.path.exists(prompts_dir):
+        print(f"Warning: Prompts directory not found at {prompts_dir}")
+        return
+    
+    for filename in os.listdir(prompts_dir):
         if filename.endswith('.txt'):
-            key = filename.split('.')[0]
-            with open(os.path.join(prompt_dir, filename), 'r', encoding='utf-8') as f:
-                PROMPTS[key] = f.read()
+            filepath = os.path.join(prompts_dir, filename)
+            try:
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    content = f.read().strip()
+                    PROMPTS[filename] = content
+                    print(f"Loaded prompt: {filename}")
+            except Exception as e:
+                print(f"Error loading {filename}: {e}")
 
 def get_current_prompt_key(step):
-    """Gets the prompt key for the current step based on sorted order."""
-    prompt_keys = sorted(PROMPTS.keys())
-    if 0 <= step < len(prompt_keys):
-        return prompt_keys[step]
-    return None
+    """Get the appropriate prompt file for the current step."""
+    prompt_files = {
+        0: '01_intro.txt',           # LLM instructions only
+        1: '02_job_sensitivity.txt', # First user-facing conversation
+        2: '04_investment_alignment.txt',
+        3: '05_economic_exposure.txt', 
+        4: '06_liquidity_intro.txt',
+        5: '07_liquidity_sources.txt',
+        6: '08_liquidity_uses.txt',
+        7: '09_liquidity_summary.txt',
+        8: '10_conclusion.txt'
+    }
+    return prompt_files.get(step, '10_conclusion.txt')
+
+def personalize_prompt(prompt_template, conversation_data):
+    """Personalize prompt with conversation data."""
+    if not conversation_data:
+        return prompt_template
+    
+    # Add any personalization logic here
+    # For now, return the prompt as-is
+    return prompt_template
+
+def store_user_data(conversation_id, step, user_message):
+    """Store user response data - placeholder for now."""
+    # TODO: Add logic to extract and store specific data points
+    # based on the conversation step and user response
+    print(f"TODO: Store data from step {step}: {user_message}")
+    
+    # This is where we'll add the Supabase storage logic
+    # to store job_economic_sensitivity, investment_risk_level, etc.
 
 @app.route('/start', methods=['POST'])
 def start_conversation():
-    """Starts a new conversation and returns the introductory prompt."""
+    """Start a new W2 strategy conversation."""
     conversation_id = str(uuid.uuid4())
+    
+    # Initialize conversation at step 1 (job_sensitivity), not step 0 (intro)
+    # Step 0 (intro) contains LLM instructions that should not be sent to user
     conversations[conversation_id] = {
-        'step': 0,
+        'step': 1,  # Start at job sensitivity, skip intro
         'history': [],
-        'data': {} # To store user's answers
+        'data': {}
     }
-
-    prompt_key = get_current_prompt_key(0)
-    prompt_text = PROMPTS[prompt_key]
-
-    state = conversations[conversation_id]
-    state['history'].append({'speaker': 'bot', 'text': prompt_text})
-
+    
+    # Get the first user-facing prompt (job sensitivity)
+    prompt_key = get_current_prompt_key(1)
+    prompt_text = PROMPTS.get(prompt_key, "Let's talk about your work and how it fits into your financial picture.")
+    
+    # Personalize if needed
+    personalized_prompt = personalize_prompt(prompt_text, {})
+    
+    # Store conversation state
+    conversations[conversation_id]['history'].append({
+        'speaker': 'bot',
+        'text': personalized_prompt
+    })
+    
     return jsonify({
         'conversation_id': conversation_id,
-        'response': prompt_text
+        'response': personalized_prompt
     })
-
-def store_user_data(state, user_message):
-    """Rudimentary logic to extract and store data from user message based on the new flow."""
-    step = state['step']
-    # The step number corresponds to the prompt the user is *responding to*.
-    if step == 1: # Response to 02_job_sensitivity
-        state['data']['job_sensitivity_raw'] = user_message
-    elif step == 2: # Response to 04_investment_alignment
-        state['data']['investment_alignment_raw'] = user_message
-    elif step == 3: # Response to 05_economic_exposure
-        state['data']['homeowner_raw'] = user_message
-    elif step == 5: # Response to 07_liquidity_sources
-        state['data']['liquidity_sources_raw'] = user_message
-    elif step == 6: # Response to 08_liquidity_uses
-        state['data']['liquidity_uses_raw'] = user_message
-
-def personalize_prompt(prompt_text, state):
-    """Personalize prompts based on stored conversation data."""
-    step = state['step'] # The step number corresponds to the prompt we are *about to send*.
-
-    # Personalize economic exposure summary (the new step 3)
-    if step == 3: # This is for prompt '05_economic_exposure'
-        job_summary = state['data'].get('job_sensitivity_raw', '...')
-        invest_summary = state['data'].get('investment_alignment_raw', '...')
-
-        # This prompt combines insights and asks a new question.
-        prompt_text = (
-            f"Thank you for sharing that. We've discussed:\n"
-            f"- Your job's economic sensitivity: '{job_summary[:50]}...'\n"
-            f"- Your investment alignment: '{invest_summary[:50]}...'\n\n"
-            "The final piece of the economic exposure puzzle is real estate. For many people, their home is their largest asset, and it's also tied to the local economy.\n\n"
-            "Do you own your primary residence? (e.g., 'Yes, I own a home' or 'No, I rent')"
-        )
-
-    # Personalize liquidity summary (the new step 7)
-    if step == 7: # This is for prompt '09_liquidity_summary'
-        sources_summary = state['data'].get('liquidity_sources_raw', '...')
-        prompt_text = (
-            f"It's a different way of thinking, for sure. So let's bring it all together.\n\n"
-            f"On one hand, you have your liquidity sources, which you described as: '{sources_summary[:100]}...'\n"
-            f"On the other, you have potential needs beyond just job loss, like health, property, or family emergencies.\n\n"
-            "How does your current liquidity stack up against this broader view of potential needs? Do you see any gaps, or maybe opportunities to be more efficient?\n\n"
-            "This is the core of strategic liquidity: matching the right type of capital to the right type of risk."
-        )
-
-    return prompt_text
 
 @app.route('/respond', methods=['POST'])
 def respond():
-    """Handles a user's response and returns the next prompt."""
+    """Handle user response and return next prompt."""
     data = request.get_json()
     conversation_id = data.get('conversation_id')
     user_message = data.get('message')
-
+    
     if not conversation_id or conversation_id not in conversations:
         return jsonify({'error': 'Invalid conversation ID'}), 400
-
+    
+    if not user_message:
+        return jsonify({'error': 'No message provided'}), 400
+    
     state = conversations[conversation_id]
-
-    # Store data from the user's response to the *previous* prompt
-    store_user_data(state, user_message)
-    state['history'].append({'speaker': 'user', 'text': user_message})
-
-    # Increment step to get the *next* prompt
-    state['step'] += 1
-    current_step_index = state['step']
-
-    next_prompt_key = get_current_prompt_key(current_step_index)
-
-    if next_prompt_key:
-        prompt_text = PROMPTS[next_prompt_key]
-        prompt_text = personalize_prompt(prompt_text, state)
-
-        state['history'].append({'speaker': 'bot', 'text': prompt_text})
-
+    current_step = state['step']
+    
+    # Store user message in history
+    state['history'].append({
+        'speaker': 'user', 
+        'text': user_message
+    })
+    
+    # Store/process user data based on current step
+    store_user_data(conversation_id, current_step, user_message)
+    
+    # Move to next step
+    next_step = current_step + 1
+    
+    # Check if conversation is complete
+    if next_step > 8:  # We have 8 conversation steps (1-8)
+        final_response = "Thank you for sharing all that information. This gives us a comprehensive picture of your financial strategy."
+        state['history'].append({
+            'speaker': 'bot',
+            'text': final_response
+        })
         return jsonify({
             'conversation_id': conversation_id,
-            'response': prompt_text
+            'response': final_response,
+            'conversation_complete': True
         })
-    else:
-        # Use the final conclusion prompt if we're at the end
-        conclusion_key = get_current_prompt_key(len(PROMPTS) - 1)
-        conclusion_text = PROMPTS[conclusion_key]
-        return jsonify({
-            'conversation_id': conversation_id,
-            'response': conclusion_text
-        })
+    
+    # Get next prompt
+    prompt_key = get_current_prompt_key(next_step)
+    prompt_text = PROMPTS.get(prompt_key, "Let's continue our conversation.")
+    
+    # Personalize based on conversation history
+    personalized_prompt = personalize_prompt(prompt_text, state['data'])
+    
+    # Update conversation state
+    state['step'] = next_step
+    state['history'].append({
+        'speaker': 'bot',
+        'text': personalized_prompt
+    })
+    
+    return jsonify({
+        'conversation_id': conversation_id,
+        'response': personalized_prompt
+    })
 
-def main():
-    """Main function to load prompts and run the Flask app."""
-    load_prompts()
-    app.run(host='0.0.0.0', port=8080, debug=True)
+@app.route('/health', methods=['GET'])
+def health():
+    """Health check endpoint."""
+    return jsonify({
+        'status': 'healthy',
+        'message': 'W2 Strategy MCP Server is running'
+    })
+
+@app.route('/', methods=['GET'])
+def root():
+    """Root endpoint with API information."""
+    return jsonify({
+        'message': 'W2 Strategy MCP Server',
+        'version': '1.0.0',
+        'endpoints': {
+            'start': '/start - Start a new conversation',
+            'respond': '/respond - Continue conversation',
+            'health': '/health - Health check'
+        }
+    })
 
 if __name__ == '__main__':
-    main()
+    print("Loading prompts...")
+    load_prompts()
+    print(f"Loaded {len(PROMPTS)} prompts")
+    
+    print("Starting W2 Strategy MCP Server...")
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port, debug=True)
