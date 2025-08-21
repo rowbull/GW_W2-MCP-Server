@@ -1,24 +1,5 @@
-Great, so we've established where your job sits on the economic sensitivity scale. Now let's look at how you approach investing.
+This is great. The final piece of the concentration puzzle is your investment portfolio. The key is to understand whether your investments balance your career risk or amplify it.
 
-When you think about your taxable investment accounts - the money you invest outside of retirement accounts like 401ks - how would you describe your approach? Are you someone who leans more toward stocks, bonds, or do you keep things pretty balanced between the two?
+For instance, the tech worker we talked about might amplify their risk by investing heavily in individual tech stocks or growth-focused funds. A different approach would be to balance that career risk by diversifying into other sectors, like healthcare, consumer staples, or international markets.
 
-I'm asking because different investment approaches have different relationships with economic cycles. Stocks tend to be more sensitive to economic ups and downs, while bonds are generally more stable. Understanding your investment style helps us see the complete picture of your economic exposure.
-
----
-
-## Framework for MCP:
-
-**HIGH INVESTMENT RISK (Rating: 3)**
-- User says: "mostly stocks", "all equity", "growth focused", "aggressive", "high risk"
-- Stocks are cyclical - rise and fall with economic cycles
-
-**MODERATE INVESTMENT RISK (Rating: 2)**  
-- User says: "balanced", "mix of stocks and bonds", "60/40", "moderate", "some of both"
-- Balanced approach with some stability from bonds
-
-**LOW INVESTMENT RISK (Rating: 1)**
-- User says: "mostly bonds", "conservative", "cash heavy", "CDs", "stable investments"
-- Conservative approach focused on stability over growth
-
-## After Response:
-Store user's answer in taxable_investment_risk_level (1-3) and move to economic exposure combination analysis.
+Without needing specific numbers, how would you describe your investment strategy? Does it lean into the same economic trends as your career, or does it intentionally diversify away from them?

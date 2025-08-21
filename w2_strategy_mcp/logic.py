@@ -1,7 +1,6 @@
 import os
 from flask import Flask, request, jsonify
 import uuid
-from supabase import create_client, Client
 
 app = Flask(__name__)
 
@@ -9,15 +8,11 @@ app = Flask(__name__)
 conversations = {}
 PROMPTS = {}
 
-# Supabase configuration
-SUPABASE_URL = os.getenv('SUPABASE_URL')
-SUPABASE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
 def load_prompts():
     """Load all prompts from the prompts directory into memory."""
     global PROMPTS
     prompt_dir = os.path.join(os.path.dirname(__file__), 'prompts')
+    # Ensure consistent order by sorting filenames
     for filename in sorted(os.listdir(prompt_dir)):
         if filename.endswith('.txt'):
             key = filename.split('.')[0]
@@ -25,7 +20,7 @@ def load_prompts():
                 PROMPTS[key] = f.read()
 
 def get_current_prompt_key(step):
-    """Gets the prompt key for the current step."""
+    """Gets the prompt key for the current step based on sorted order."""
     prompt_keys = sorted(PROMPTS.keys())
     if 0 <= step < len(prompt_keys):
         return prompt_keys[step]
@@ -38,7 +33,7 @@ def start_conversation():
     conversations[conversation_id] = {
         'step': 0,
         'history': [],
-        'data': {}
+        'data': {} # To store user's answers
     }
 
     prompt_key = get_current_prompt_key(0)
@@ -53,63 +48,47 @@ def start_conversation():
     })
 
 def store_user_data(state, user_message):
-    """Extract and store data from user message to Supabase."""
+    """Rudimentary logic to extract and store data from user message based on the new flow."""
     step = state['step']
-    conversation_id = state.get('conversation_id')
-    
-    # Store the response for this step
-    if step == 1:  # Job sensitivity response
+    # The step number corresponds to the prompt the user is *responding to*.
+    if step == 1: # Response to 02_job_sensitivity
         state['data']['job_sensitivity_raw'] = user_message
-        # TODO: Parse and determine job_economic_sensitivity (1-3 scale)
-        
-    elif step == 2:  # Geographic risk response
-        state['data']['geographic_risk_raw'] = user_message
-        
-    elif step == 3:  # Investment alignment response
+    elif step == 2: # Response to 04_investment_alignment
         state['data']['investment_alignment_raw'] = user_message
-        
-    elif step == 6:  # Liquidity sources response
+    elif step == 3: # Response to 05_economic_exposure
+        state['data']['homeowner_raw'] = user_message
+    elif step == 5: # Response to 07_liquidity_sources
         state['data']['liquidity_sources_raw'] = user_message
-        
-    elif step == 7:  # Liquidity uses response
+    elif step == 6: # Response to 08_liquidity_uses
         state['data']['liquidity_uses_raw'] = user_message
-
-    # Save to Supabase when we have meaningful data
-    if conversation_id and len(state['data']) > 0:
-        try:
-            # For now, just store the conversation data
-            # TODO: Parse responses and populate specific columns
-            result = supabase.table('user_profile_data').upsert({
-                'id': conversation_id,  # Use conversation_id as primary key
-                'conversation_data': state['data']
-            }).execute()
-        except Exception as e:
-            print(f"Error saving to Supabase: {e}")
 
 def personalize_prompt(prompt_text, state):
     """Personalize prompts based on stored conversation data."""
-    step = state['step']
+    step = state['step'] # The step number corresponds to the prompt we are *about to send*.
 
-    if step == 4:  # Concentration summary
+    # Personalize economic exposure summary (the new step 3)
+    if step == 3: # This is for prompt '05_economic_exposure'
         job_summary = state['data'].get('job_sensitivity_raw', '...')
-        geo_summary = state['data'].get('geographic_risk_raw', '...')
         invest_summary = state['data'].get('investment_alignment_raw', '...')
 
+        # This prompt combines insights and asks a new question.
         prompt_text = (
             f"Thank you for sharing that. We've discussed:\n"
-            f"- Your job's economic sensitivity\n"
-            f"- Your geographic concentration\n"
-            f"- Your investment alignment\n\n"
-            "This understanding of risk concentration leads directly to our next topic: "
-            "building a sophisticated liquidity strategy. Ready to move on to that?"
+            f"- Your job's economic sensitivity: '{job_summary[:50]}...'\n"
+            f"- Your investment alignment: '{invest_summary[:50]}...'\n\n"
+            "The final piece of the economic exposure puzzle is real estate. For many people, their home is their largest asset, and it's also tied to the local economy.\n\n"
+            "Do you own your primary residence? (e.g., 'Yes, I own a home' or 'No, I rent')"
         )
 
-    elif step == 8:  # Liquidity summary
+    # Personalize liquidity summary (the new step 7)
+    if step == 7: # This is for prompt '09_liquidity_summary'
+        sources_summary = state['data'].get('liquidity_sources_raw', '...')
         prompt_text = (
-            "Let's bring it all together. You've shared your liquidity sources and "
-            "we've talked about potential uses beyond just job loss.\n\n"
-            "How does your current liquidity stack up against this broader view of potential needs? "
-            "Do you see any gaps, or opportunities to be more efficient?"
+            f"It's a different way of thinking, for sure. So let's bring it all together.\n\n"
+            f"On one hand, you have your liquidity sources, which you described as: '{sources_summary[:100]}...'\n"
+            f"On the other, you have potential needs beyond just job loss, like health, property, or family emergencies.\n\n"
+            "How does your current liquidity stack up against this broader view of potential needs? Do you see any gaps, or maybe opportunities to be more efficient?\n\n"
+            "This is the core of strategic liquidity: matching the right type of capital to the right type of risk."
         )
 
     return prompt_text
@@ -125,13 +104,12 @@ def respond():
         return jsonify({'error': 'Invalid conversation ID'}), 400
 
     state = conversations[conversation_id]
-    state['conversation_id'] = conversation_id
+
+    # Store data from the user's response to the *previous* prompt
+    store_user_data(state, user_message)
     state['history'].append({'speaker': 'user', 'text': user_message})
 
-    # Store data from previous step's response
-    store_user_data(state, user_message)
-
-    # Increment step to get the next prompt
+    # Increment step to get the *next* prompt
     state['step'] += 1
     current_step_index = state['step']
 
@@ -148,8 +126,9 @@ def respond():
             'response': prompt_text
         })
     else:
-        # End of conversation
-        conclusion_text = "Thank you for this thoughtful conversation about your financial strategy."
+        # Use the final conclusion prompt if we're at the end
+        conclusion_key = get_current_prompt_key(len(PROMPTS) - 1)
+        conclusion_text = PROMPTS[conclusion_key]
         return jsonify({
             'conversation_id': conversation_id,
             'response': conclusion_text

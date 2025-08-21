@@ -1,55 +1,7 @@
-# W2 Strategy MCP - First Prompt
+Welcome! This is a different kind of financial conversation. We're not going to talk about budgets or picking stocks. Instead, we'll focus on your overall financial strategy, centered around your most significant asset: your career.
 
-## Logic: Check session_context for job information
+Our goal is to help you understand two connected ideas:
+1.  **Economic Concentration Risk**: How your job, location, and investments might be tied to the same economic forces.
+2.  **Comprehensive Liquidity**: Thinking beyond a simple emergency fund to create a robust strategy for handling unexpected expenses.
 
-### If we have clear job/company context (e.g., "Google engineer", "teacher", "nurse at hospital"):
-
-Based on our earlier conversation, I see you work [at COMPANY/as ROLE]. Let's talk about how that fits into your overall financial picture.
-
-[COMPANY/INDUSTRY] tends to be [CYCLICAL/STABLE/COUNTER-CYCLICAL] when it comes to economic cycles. What I mean is, when the economy hits rough patches, [SPECIFIC INDUSTRY BEHAVIOR - e.g., "tech companies often freeze hiring and stock prices drop" / "healthcare stays pretty steady" / "government jobs remain stable"].
-
-Does that match your experience? Do you see your job as pretty sensitive to economic ups and downs, or more stable regardless of what's happening in the broader economy?
-
----
-
-### If we have vague context (e.g., "consulting", "finance", "business"):
-
-I see you work in [INDUSTRY] - that covers a lot of ground. To understand how economic cycles might affect your situation, I'd love to know a bit more. What type of [consulting/finance/business] work do you do, and what kind of company or organization?
-
----
-
-### If we have no job context or it's unclear:
-
-To understand your economic exposure, I need to know what you do for work. What company or industry are you in? This helps me figure out how economic cycles might affect both your job security and any company benefits or stock you might have.
-
----
-
-## Economic Sensitivity Framework for MCP:
-
-**CYCLICAL (Rating: 3)**
-- Technology (Google, Meta, Apple, startups)
-- Financial Services (investment banking, private equity)
-- Construction and Real Estate
-- Automotive
-- Airlines and Travel
-- Hospitality and Restaurants
-- Luxury Goods
-- Non-essential Retail
-
-**NON-CYCLICAL (Rating: 2)** 
-- Healthcare (hospitals, medical practices)
-- Utilities (electric, water, gas)
-- Consumer Staples (grocery, household goods)
-- Education (schools, universities)
-- Government and Public Services
-- Pharmaceuticals
-
-**COUNTER-CYCLICAL (Rating: 1)**
-- Discount retail and thrift stores
-- Debt collection services
-- Bankruptcy and legal services
-- Pawn shops
-- Repossession services
-
-## Confirmation Script:
-After user confirms or disagrees, store their response in job_economic_sensitivity (1-3) and continue to investment risk assessment.
+Ready to get started?
