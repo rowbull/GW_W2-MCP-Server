@@ -1,12 +1,18 @@
 import os
 from flask import Flask, request, jsonify
 import uuid
+from supabase import create_client, Client
 
 app = Flask(__name__)
 
 # In-memory storage for conversation state
 conversations = {}
 PROMPTS = {}
+
+# Supabase configuration
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def load_prompts():
     """Load all prompts from the prompts directory into memory."""
@@ -47,18 +53,30 @@ def start_conversation():
     })
 
 def store_user_data(state, user_message):
-    """Rudimentary logic to extract and store data from user message."""
+    """Extract and store data from user message to Supabase."""
     step = state['step']
-    if step == 1: # Response to 02_job_sensitivity
+    conversation_id = state.get('conversation_id')
+    
+    # For now, just store the raw responses - we'll add smart parsing later
+    if step == 1:  # Response to job sensitivity
         state['data']['job_sensitivity_raw'] = user_message
-    elif step == 2: # Response to 03_geographic_risk
+    elif step == 2:  # Response to geographic risk  
         state['data']['geographic_risk_raw'] = user_message
-    elif step == 3: # Response to 04_investment_alignment
+    elif step == 3:  # Response to investment alignment
         state['data']['investment_alignment_raw'] = user_message
-    elif step == 6: # Response to 07_liquidity_sources
+    elif step == 6:  # Response to liquidity sources
         state['data']['liquidity_sources_raw'] = user_message
-    elif step == 7: # Response to 08_liquidity_uses
+    elif step == 7:  # Response to liquidity uses
         state['data']['liquidity_uses_raw'] = user_message
+        
+    # Save to Supabase (basic version for now)
+    try:
+        result = supabase.table('user_profile_data').upsert({
+            'conversation_id': conversation_id,
+            'raw_w2_data': state['data']
+        }).execute()
+    except Exception as e:
+        print(f"Error saving to Supabase: {e}")
 
 
 def personalize_prompt(prompt_text, state):
