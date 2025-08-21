@@ -1,9 +1,42 @@
-That's a clear picture of your sources. Now, let's think about the other side of the equation: potential uses for that liquidity.
+# W2 Strategy MCP - Liquidity Uses Prompt
 
-Most financial advice focuses only on income replacement after a job loss. But life is more complex. Consider a scenario where in the same year you have to:
-- Cover a large medical deductible.
-- Pay for a major home repair that insurance doesn't fully cover.
-- Replace a car after an accident, wanting something nicer than the insurance payout.
-- Help a family member in a crisis.
+Now let's think about what you might actually need that liquidity for. Most people only think about job loss, but there are actually several scenarios where you might need cash quickly.
 
-This isn't to be alarming, but to be realistic. A robust liquidity plan prepares for multiple, overlapping needs. Have you ever thought about planning for these kinds of "stacked" financial shocks?
+**Basic Monthly Budget:**
+First, what would you estimate your essential monthly expenses to be? I'm talking about the must-pay stuff - housing, food, insurance, loan payments - not the nice-to-haves.
+
+**Emergency Fund Target:**
+How many months of those expenses do you feel comfortable having set aside? This is your baseline liquidity target.
+
+**Beyond Job Loss - Other Cash Needs:**
+But let's think about other scenarios where you might need cash fast:
+
+[IF HOMEOWNER] **Home-Related Emergencies:** If something major happened to your house that insurance didn't fully cover, or if you needed to make repairs quickly, how much might that cost?
+
+**Healthcare Maximum:** What's your health insurance maximum out-of-pocket for the year? If you had a serious medical situation, this is the most you'd pay.
+
+**Vehicle/Transportation:** If your car was totaled and insurance gave you a check, but you wanted to upgrade or needed a car immediately, how much cash might you need to bridge that gap?
+
+The point isn't to plan for every possible scenario, but to think beyond just "losing my job" when considering how much liquidity makes sense.
+
+---
+
+## Data Collection Framework:
+
+**Core Budget Data:**
+- monthly_spending_estimate: Essential monthly expenses only
+- emergency_budget_months: Target months of coverage (usually 3-12)
+
+**Additional Scenarios:**
+- home_emergency_estimate: [IF HOMEOWNER] Major home repairs/issues
+- healthcare_max_oop: Annual health insurance maximum out-of-pocket
+- vehicle_bridge_amount: Transportation replacement/upgrade gap
+
+**Calculation Logic:**
+- Base need: monthly_spending × emergency_budget_months
+- Additional scenarios: Sum of specific risk estimates
+- Total liquidity target: Base + Additional scenarios
+- Compare against available sources from previous step
+
+## Transition Setup:
+"So your baseline need is [MONTHLY × MONTHS], plus potentially [ADDITIONAL SCENARIOS] for these other situations. Let's see how that compares to what you actually have available..."
