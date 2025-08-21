@@ -54,12 +54,14 @@ def start_conversation():
 
 def store_user_data(state, user_message):
     """Extract and store data from user message to Supabase."""
+    print(f"DEBUG: store_user_data called with step {state['step']}")
     step = state['step']
     conversation_id = state.get('conversation_id')
     
     # For now, just store the raw responses - we'll add smart parsing later
     if step == 1:  # Response to job sensitivity
         state['data']['job_sensitivity_raw'] = user_message
+        print(f"DEBUG: Stored job sensitivity data")
     elif step == 2:  # Response to geographic risk  
         state['data']['geographic_risk_raw'] = user_message
     elif step == 3:  # Response to investment alignment
@@ -70,13 +72,15 @@ def store_user_data(state, user_message):
         state['data']['liquidity_uses_raw'] = user_message
         
     # Save to Supabase (basic version for now)
+    print(f"DEBUG: Attempting to save to Supabase...")
     try:
         result = supabase.table('user_profile_data').upsert({
             'conversation_id': conversation_id,
             'raw_w2_data': state['data']
         }).execute()
+        print(f"DEBUG: Supabase save successful: {result}")
     except Exception as e:
-        print(f"Error saving to Supabase: {e}")
+        print(f"ERROR saving to Supabase: {e}")
 
 
 def personalize_prompt(prompt_text, state):
