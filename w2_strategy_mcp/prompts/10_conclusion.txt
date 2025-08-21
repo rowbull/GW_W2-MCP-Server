@@ -1,8 +1,56 @@
-We've covered a lot of ground, moving from high-level economic risks right down to the details of your liquidity plan.
+# W2 Strategy MCP - Conclusion Prompt
 
-By thinking through these concepts, you've developed a sophisticated, integrated view of your financial life. You now have a framework to:
-1.  Assess your economic concentration across your career, geography, and investments.
-2.  Analyze your liquidity needs beyond just an emergency fund.
-3.  Understand how your career risk should influence your investment approach.
+That gives us a comprehensive picture of your financial strategy. Let me summarize what we've learned:
 
-This is the kind of strategic thinking that builds long-term financial resilience. Thank you for engaging in this important conversation. Our goal was to provide a new way to think, and you've done just that.
+**Your Economic Exposure Profile:**
+- Job sensitivity: [RATING] ([HIGH/MODERATE/LOW] sensitivity to economic cycles)
+- Investment approach: [RATING] ([AGGRESSIVE/BALANCED/CONSERVATIVE])
+- Combined exposure score: [CALCULATED SCORE] = [HIGH/MODERATE/LOW] overall exposure
+[IF HOMEOWNER] - Plus homeownership adds another layer of economic connection
+
+**Your Liquidity Position:**
+- Available liquidity: [TOTAL SOURCES]
+- Target needs: [TOTAL USES]  
+- Current position: [SURPLUS/DEFICIT] of [AMOUNT]
+
+**Key Insights:**
+The most important thing isn't whether your exposure is high or low - it's that you understand it and make intentional choices. [PERSONALIZED INSIGHT BASED ON PROFILE]
+
+**What This Means Going Forward:**
+This analysis gives you a framework for making financial decisions that account for your specific situation. Whether it's career moves, investment choices, or major purchases, you now have a clearer picture of how different pieces of your financial life connect to each other and to broader economic trends.
+
+Is there anything about this analysis that surprised you, or any part you'd like to explore further?
+
+---
+
+## Personalized Insights by Profile:
+
+**HIGH Exposure + SURPLUS Liquidity:**
+"You have high economic exposure but strong liquidity - this gives you flexibility to ride out volatility while staying aggressive with growth."
+
+**HIGH Exposure + DEFICIT Liquidity:**  
+"Your high economic exposure makes building more liquidity particularly important, since multiple things could hit at once."
+
+**LOW Exposure + SURPLUS Liquidity:**
+"Your stable profile means you might be able to put some of that cash to work more aggressively elsewhere."
+
+**LOW Exposure + DEFICIT Liquidity:**
+"Your stable situation gives you time to build up liquidity methodically without rushing."
+
+**MODERATE Exposure (any liquidity):**
+"Your balanced profile gives you flexibility - you're not overly concentrated but not overly conservative either."
+
+## Conversation Flow Options:
+1. User asks follow-up questions → Continue conversation naturally
+2. User seems satisfied → Transition back to general financial conversation
+3. User wants specific recommendations → Connect to other MCPs (Savings, Investment, etc.)
+
+## Data Summary for Storage:
+All collected data points should be stored in user_profile_data:
+- job_economic_sensitivity (1-3)
+- taxable_investment_risk_level (1-3) 
+- homeowner (boolean)
+- monthly_spending_estimate (numeric)
+- emergency_budget_months (numeric)
+- deposits_amount, brokerage_cash_amount, available_credit_amount (numeric)
+- liquidity_surplus_deficit (calculated numeric)
